@@ -1,0 +1,32 @@
+{
+  "name": "njx1",
+  "version": "1.0.0",
+  "description": "X1 Parser and Web API manipulation",
+  "main": "njx1.js",
+  "build": "x1.js.build",
+  "scripts": {
+    "preinstall": "node build.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajiedx/x1js.git"
+  },
+  "keywords": [
+    "NjSuper",
+    "Parser",
+    "HTML",
+    "Syntax",
+    "Web",
+    "Browser",
+    "X1",
+    "Web",
+    "API"
+  ],
+  "author": "ajiedx",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ajiedx/x1js/issues"
+  },
+  "homepage": "https://github.com/ajiedx/x1js#readme"
+}
