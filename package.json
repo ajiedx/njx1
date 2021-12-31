@@ -1,11 +1,10 @@
 {
   "name": "njx1",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "X1 Parser and Web API manipulation",
   "main": "njx1.js",
   "build": "x1.js.build",
   "scripts": {
-    "preinstall": "node build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
