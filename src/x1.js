@@ -51,8 +51,9 @@ class X1 extends NjSuper {
     }
 
     x1(file) {
+        file = file + '\n'
         let pjms = [], line = [''], id = 0, sptag = '', continueattr = false, addattrs = ['']
-        let launch = false, lid = 0, low = [], x1 = {}, x1in = {}, x1j = {}
+        let launch = false, lid = 0, low = [], x1 = {}, x1in = {}, x1j = {}, zero = false
 
         const objElement = (string, value) => {
             let ctag = [], vtag = [], vr = 0, elmnt = {}
@@ -138,8 +139,6 @@ class X1 extends NjSuper {
         for (let i in file) {
             if (file[i] !== ' ') {
                 if (file[i] === '*') {
-                    // console.log(line[lid])
-                    // pjms[id] = '#', id = id + 1
                     pjms[id] = line[lid] + ' ' + file[i],  lid = lid + 1
 
                     line[lid] = file[i]
@@ -182,23 +181,32 @@ class X1 extends NjSuper {
                         id = id + 1
                     }
 
-                } else if (file[i] === '\n' || file[i] === '}') {
+                } else if (file[i] === '\n') {
+                   
                     if (this.isIntro('{', line[lid])) {
-                        // addattrs.push([]), i = i + 2
-                        line[lid + 1] = 'before='+this.filterChars(line[lid], '{')
+                        line[lid + 1] = 'before='+this.filterChars(line[lid].slice(1, line[lid].length))
                         line[lid] = 's'
-
-                    } else if (file[i] === '}') {
+                        lid = lid + 1
+                    }
+                    
+                    if (this.isEnd('}', line[lid])) {
                         let al = line[lid].length - 1, aline = '', attr = false, complete = false, cl = line[lid]
-                        line[lid] = '', lid = lid + 1, line[lid] = '*'
+                        line[lid] = ''
+                        
                         for (;;) {
-                            if (al > 0) {
+                            if (al > -1) {
                                 if (!attr)
-                                    if (cl[al] === '{') attr = true, al--, lid = lid + 1, line[lid] = ''
-                                    else attr = false, aline = cl[al] + aline
+                                    if (cl[al] === '{') attr = true, al--
+                                    else aline = cl[al] + aline
                                 if (!complete && attr) {
                                     if (cl[al] === '>') {
-                                        complete = true, lid = lid - 2, line[lid] = '>'
+                                        line[lid + 1] = '\n'
+                                        line[lid + 2] = line[lid]
+                                        complete = true, line[lid] = '>'
+                                    } else if (al == 0) {
+                                        zero = true
+                                        line[lid] = cl[al] + line[lid]
+                                        break
                                     } else line[lid] = cl[al] + line[lid]
                                 } else if (complete) {
                                     line[lid] = cl[al] + line[lid]
@@ -207,17 +215,21 @@ class X1 extends NjSuper {
 
                             al = al - 1
                         }
-
-                        line[lid -2] = line[lid -2].trim() + ' '
-                        pjms[id] = line[lid], id = id + 1
-                        addattrs.push(['after', aline])
-                        lid = lid + 2
+                        if (zero) {
+                            addattrs.push(['after', aline])
+                        } else {
+                            line[lid -2] = line[lid -2].trim() + ' '
+                            pjms[id] = line[lid], id = id + 1
+                            lid = lid + 2
+                            addattrs.push(['after', aline])
+                        }
+                       
                     }
 
 
                     if (line[lid - 1] === '*' || line[lid - 1] === '\n') {
 
-                        if (addattrs.length > 1) pjms[id] = '#', id = id + 1
+                        if (!zero && addattrs.length > 1) pjms[id] = '#', id = id + 1
                         low = this.filterChars(line[lid], '\n').split(' ')
 
                         for (const l in low) {
@@ -286,7 +298,6 @@ class X1 extends NjSuper {
                     }
 
                 } else if (file[i - 1] === '=') {
-
 
                     launch = true; line[lid] = line[lid] + file[i]
                 } else if (continueattr) {
