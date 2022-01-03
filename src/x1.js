@@ -3,11 +3,15 @@ const { NjSuper } = require('njsuper')
 class X1 extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
+        this.elements = {}
+        this.options = {}
+        this.id = 0
+        this.ids = []
+        this.x1id = -1
     }
 
-    createX1Elements(x1, type) {
+    createX1Elements(x1, name) {
         // this.output(x1)
-        this.ids = []
         function createX1Child (element, x1in) {
             for (let x in x1in) {
                 if (!isNaN(x)) {
@@ -33,24 +37,33 @@ class X1 extends NjSuper {
                 }
             }
         }
+        
+        if (this.ids[this.x1id]) this.id = this.id + 1
+        this.x1id = this.x1id + 1
+        let count = this.id
+        let idcount = [this.id]
         for (let x in x1) {
             if (!isNaN(x)) {
+                if (count > this.id) this.id = this.id + 1
                 this.elements[this.id] = document.createElement(x1[x].in.name)
+                if (this.typeof(this.options[this.id]) === 'undefined') this.options[this.id] = []
                 for (let a in x1[x].in) {
                     if (!isNaN(a)) {
+                        console.log(x1[x].in[a])
                         this.elements[this.id].setAttribute(x1[x].in[a][0], x1[x].in[a][1])
-                        this.options[this.id] = x1[x].in[a]
-
+                        this.options[this.id].push(x1[x].in[a])
                     }
                 }
                 createX1Child(this.elements[this.id], x1[x])
-                this.ids.push(this.id)
-                this.id = this.id + 1
+                count = count + 1
             }
         }
+        idcount.push(this.id)
+        this.ids.push(idcount)
     }
 
-    x1(file) {
+    x1(file, name) {
+        if (file.length < 300) console.log(file)
         file = file + '\n'
         let pjms = [], line = [''], id = 0, sptag = '', continueattr = false, addattrs = ['']
         let launch = false, lid = 0, low = [], x1 = {}, x1in = {}, x1j = {}, zero = false
@@ -59,9 +72,11 @@ class X1 extends NjSuper {
             let ctag = [], vtag = [], vr = 0, elmnt = {}
             if (addattrs.length > 1)
                 for (const i in addattrs)
-                    if (addattrs[i] !== '')
+                    if (addattrs[i] !== '') {
+                        addattrs[i][1] = this.filterChars(addattrs[i][1], '}')
                         this.pin(elmnt, addattrs[i])
-
+                    }
+                
                 addattrs = ['']
 
             ctag = this.splitCharsFilter(string, ' >*=', ' >*\n')
@@ -69,7 +84,7 @@ class X1 extends NjSuper {
             for (var es = 0; es < ctag.length; es++) {
                 if (ctag[es] !== '' && ctag[es] != undefined) {
                     if (!tagf) vtag[0] = ctag[es], vr = vr + 1
-                    else if (this.isEnd('=', ctag[es]))  vtag[vr] = [this.filterChars(ctag[es], ' ='), this.filterChars(ctag[es +1], ' \n')], vr = vr + 1, es++
+                    else if (this.isEnd('=', ctag[es]))  vtag[vr] = [this.filterChars(ctag[es], ' ='), this.filterChars(ctag[es +1], ' }\n')], vr = vr + 1, es++
                     else if (value) vtag[vr] = vtag[vr] ? vtag[vr]+' '+ ctag[es] : ctag[es]
                     tagf = true
                 }
@@ -244,7 +259,7 @@ class X1 extends NjSuper {
                                             sptag = this.splitOnce(pjms[pj], low[l]+' ', 'right', 'last')
                                             if (this.isIntro('#', pjms[id - 1])) {
                                                 if (sptag[0].includes('=') && this.countChars(sptag[0], ' ') == 1)
-                                                    sptag[1] = this.filterChars(sptag[1], '>') + ' ' + sptag[0] + ' >'
+                                                    sptag[1] = this.filterChars(sptag[1], '>') + ' ' + this.filterChars(sptag[0]) + ' >'
                                                 if (sptag[0]=== '' || this.isIntro('s', sptag[0])) {
 
                                                     x1[id] = {}, pin(id, pj, 'up')
@@ -312,7 +327,7 @@ class X1 extends NjSuper {
 
         // this.output(pjms)
         // console.log(x1)
-        this.createX1Elements(x1)
+        this.createX1Elements(x1, name)
     }
 }
 
