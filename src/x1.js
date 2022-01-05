@@ -49,7 +49,6 @@ class X1 extends NjSuper {
                 if (this.typeof(this.options[this.id]) === 'undefined') this.options[this.id] = []
                 for (let a in x1[x].in) {
                     if (!isNaN(a)) {
-                        console.log(x1[x].in[a])
                         this.elements[this.id].setAttribute(x1[x].in[a][0], x1[x].in[a][1])
                         this.options[this.id].push(x1[x].in[a])
                     }
@@ -63,21 +62,14 @@ class X1 extends NjSuper {
     }
 
     x1(file, name) {
-        if (file.length < 300) console.log(file)
+        // if (file.length < 300) console.log(file)
         file = file + '\n'
         let pjms = [], line = [''], id = 0, sptag = '', continueattr = false, addattrs = ['']
         let launch = false, lid = 0, low = [], x1 = {}, x1in = {}, x1j = {}, zero = false
 
         const objElement = (string, value) => {
             let ctag = [], vtag = [], vr = 0, elmnt = {}
-            if (addattrs.length > 1)
-                for (const i in addattrs)
-                    if (addattrs[i] !== '') {
-                        addattrs[i][1] = this.filterChars(addattrs[i][1], '}')
-                        this.pin(elmnt, addattrs[i])
-                    }
-                
-                addattrs = ['']
+
 
             ctag = this.splitCharsFilter(string, ' >*=', ' >*\n')
             let tagf = false
@@ -144,6 +136,30 @@ class X1 extends NjSuper {
             }
         }
 
+        const pinx1ins = (id, pj) => {
+            for (let idn in x1in) {
+                if (idn > pj && idn < id) {
+                    this.pin(x1j[id], x1in[idn])
+                    delete x1in[idn]
+                } else {
+                    this.pin(x1, x1in[idn], idn)
+                    delete x1in[idn]
+                }
+            }
+        }
+
+        const pinAddAttr = (x) => {
+            if (addattrs.length > 1)
+                for (const i in addattrs)
+                    if (addattrs[i] !== '') {
+                        addattrs[i][1] = this.filterChars(addattrs[i][1], '}')
+                        if (x === 'x1') this.pin(x1[id].in, addattrs[i])
+                        else if (x === 'x1j') this.pin(x1j[id].in, addattrs[i])
+                        
+                    }
+            
+                addattrs = ['']
+        }
 
         const pin = (id, pj, up) => {
             if (up) pinx1(id, pj), pinx1j(id, pj)
@@ -230,17 +246,16 @@ class X1 extends NjSuper {
 
                             al = al - 1
                         }
-                        if (zero) {
-                            addattrs.push(['after', aline])
-                        } else {
+
+                        if (zero) addattrs.push(['after', aline])
+                        else {
                             line[lid -2] = line[lid -2].trim() + ' '
                             pjms[id] = line[lid], id = id + 1
                             lid = lid + 2
                             addattrs.push(['after', aline])
                         }
-                       
-                    }
 
+                    }
 
                     if (line[lid - 1] === '*' || line[lid - 1] === '\n') {
 
@@ -260,32 +275,20 @@ class X1 extends NjSuper {
                                             if (this.isIntro('#', pjms[id - 1])) {
                                                 if (sptag[0].includes('=') && this.countChars(sptag[0], ' ') == 1)
                                                     sptag[1] = this.filterChars(sptag[1], '>') + ' ' + this.filterChars(sptag[0]) + ' >'
-                                                if (sptag[0]=== '' || this.isIntro('s', sptag[0])) {
-
+                                                if (sptag[0] === '' || this.isIntro('s', sptag[0])) {
                                                     x1[id] = {}, pin(id, pj, 'up')
-                                                    x1[id].in = objElement(sptag[1])
-                                                } else if (x1j.hasOwnProperty(0)) {
-
+                                                    x1[id].in = objElement(sptag[1]) } else if (x1j.hasOwnProperty(0)) {
                                                     x1[id] = {}, pin(id, pj)
-                                                    x1[id].in = objElement(sptag[1])
-                                                } else {
-
+                                                    x1[id].in = objElement(sptag[1]) } else {
                                                     x1[id] = {}, pinx1in(id, pj), pinx1(id, pj, 'up')
                                                     x1[id].in = objElement(sptag[1])
+                                                    pinAddAttr('x1')
                                                 }
 
-                                            } else {
-                                                x1j[id] = {}
-                                                for (let idn in x1in) {
-                                                    if (idn > pj && idn < id) {
-                                                        this.pin(x1j[id], x1in[idn])
-                                                        delete x1in[idn]
-                                                    } else {
-                                                        this.pin(x1, x1in[idn], idn)
-                                                        delete x1in[idn]
-                                                    }
-                                                }
+                                            } else { x1j[id] = {}, pinx1ins(id, pj)
+
                                                 x1j[id].in = objElement(sptag[1])
+                                                pinAddAttr('x1j')
                                             }
                                             pjms[pj] = sptag[0]
                                             pjms[id] = '# ' + sptag[1] + pjms[id]
